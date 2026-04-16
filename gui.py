@@ -25,7 +25,7 @@ class Gui:
 
         # set up vote menu
         self.frame_title = Frame(self.top_container, bg='#1a0a14')
-        self.label_title = Label(self.frame_title, text='🌸  VOTE COUNTER  🌸',
+        self.label_title = Label(self.frame_title, text='  VOTE COUNTER  ',
                                  bg='#1a0a14', fg='#f9d4e8',
                                  font=('Georgia', 14, 'bold'))
         self.label_subtitle = Label(self.frame_title, text='- - - - - - - - - - - - - - - - - -',
@@ -45,14 +45,14 @@ class Gui:
         self.radio_1.set(0)
 
 #set the radio buttons
-        self.radio_vote = Radiobutton(self.frame_option, text='🗳  v: Vote',
+        self.radio_vote = Radiobutton(self.frame_option, text='  v: Vote',
                                       variable=self.radio_1, value=1, command=self.show_candidates,
                                       bg='#2d1228', fg='#ffd6ea', selectcolor='#8b1a4a',
                                       activebackground='#2d1228', activeforeground='#ffd6ea',
                                       font=('Georgia', 10, 'bold'), width=12, anchor='w',
                                       relief='groove', bd=2, padx=5, pady=4, indicatoron=0)
 
-        self.radio_exit = Radiobutton(self.frame_option, text='✖  x: Exit',
+        self.radio_exit = Radiobutton(self.frame_option, text='  x: Exit',
                                       variable=self.radio_1, value=2, command=self.show_results,
                                       bg='#1e0a2e', fg='#e8c8ff', selectcolor='#4a1a5e',
                                       activebackground='#1e0a2e', activeforeground='#e8c8ff',
@@ -72,28 +72,28 @@ class Gui:
         self.radio_2 = IntVar()
         self.radio_2.set(0)
 
-        self.radio_isabella = Radiobutton(self.frame_candidate, text='🌷 1: Isabella',
+        self.radio_isabella = Radiobutton(self.frame_candidate, text=' 1: Isabella',
                                           variable=self.radio_2, value=1,
                                           bg='#2d1228', fg='#f9d4e8', selectcolor='#7a1a4a',
                                           activebackground='#2d1228', activeforeground='#f9d4e8',
                                           font=('Georgia', 9, 'bold'), width=11, anchor='w',
                                           relief='groove', bd=2, padx=5, pady=4, indicatoron=0)
 
-        self.radio_genji = Radiobutton(self.frame_candidate, text='🌙 2: Genji',
+        self.radio_genji = Radiobutton(self.frame_candidate, text=' 2: Genji',
                                        variable=self.radio_2, value=2,
                                        bg='#2d1228', fg='#f9d4e8', selectcolor='#7a1a4a',
                                        activebackground='#2d1228', activeforeground='#f9d4e8',
                                        font=('Georgia', 9, 'bold'), width=11, anchor='w',
                                        relief='groove', bd=2, padx=5, pady=4, indicatoron=0)
 
-        self.radio_hannah = Radiobutton(self.frame_candidate, text='✨ 3: Hannah',
+        self.radio_hannah = Radiobutton(self.frame_candidate, text=' 3: Hannah',
                                         variable=self.radio_2, value=3,
                                         bg='#2d1228', fg='#f9d4e8', selectcolor='#7a1a4a',
                                         activebackground='#2d1228', activeforeground='#f9d4e8',
                                         font=('Georgia', 9, 'bold'), width=11, anchor='w',
                                         relief='groove', bd=2, padx=5, pady=4, indicatoron=0)
 
-        self.radio_ira = Radiobutton(self.frame_candidate, text='👑 4: Ira',
+        self.radio_ira = Radiobutton(self.frame_candidate, text=' 4: Ira',
                                      variable=self.radio_2, value=4,
                                      bg='#2d1228', fg='#f9d4e8', selectcolor='#7a1a4a',
                                      activebackground='#2d1228', activeforeground='#f9d4e8',

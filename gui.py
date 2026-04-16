@@ -5,33 +5,33 @@ from PyQt6.QtGui import QFont
 
 
 class VoteApp(QWidget):
-    """Main GUI class for the Vote Counter application using PyQt6."""
+# main class for the gui
 
     def __init__(self, data_manager) -> None:
-        """Initializes the window, layout, and connects to the Data Manager."""
+# create window layout
         super().__init__()
         self.__data_manager = data_manager
         self.__setup_ui()
 
     def __setup_ui(self) -> None:
-        """Initializes the UI, including a stacked layout for switching screens."""
+# create system for setting screens and stuff
         self.setWindowTitle("Vote Counter")
-        self.resize(320, 420)  # Made the window slightly taller to fit the big boxes
+        self.resize(320, 420)
         self.setStyleSheet("background-color: #1a0a14; color: #f9d4e8;")
 
         main_layout = QVBoxLayout()
 
-        # Title Header
+# make the gui title
         title_label = QLabel("VOTE COUNTER")
         title_label.setFont(QFont("Georgia", 14, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         main_layout.addWidget(title_label)
 
-        # The Stacked Widget allows us to switch between the Menu and the Voting Booth
+# change from voting menu to main menu, etc
         self.__stacked_widget = QStackedWidget()
         main_layout.addWidget(self.__stacked_widget)
 
-        # ================= PAGE 0: MAIN MENU =================
+# make da main menu
         self.__menu_page = QWidget()
         menu_layout = QVBoxLayout()
 
@@ -55,7 +55,7 @@ class VoteApp(QWidget):
         self.__menu_page.setLayout(menu_layout)
         self.__stacked_widget.addWidget(self.__menu_page)
 
-        # ================= PAGE 1: VOTING BOOTH =================
+# create voting boxes and crap
         self.__vote_page = QWidget()
         vote_layout = QVBoxLayout()
 
@@ -65,14 +65,13 @@ class VoteApp(QWidget):
         vote_layout.addWidget(cand_label)
 
         self.__candidate_group = QButtonGroup(self)
-
-        # Switched from QRadioButton to QPushButton to create "Boxes"
+# make boxes and give them names
         self.__box_isa = QPushButton("Isabella")
         self.__box_gen = QPushButton("Genji")
         self.__box_han = QPushButton("Hannah")
         self.__box_ira = QPushButton("Ira")
 
-        # Styling to make them look like clickable cards that light up when checked
+# allow user to see higlighted button to make sure they pressed the right candidate
         box_style = """
             QPushButton {
                 background-color: #2d1228;
@@ -94,14 +93,14 @@ class VoteApp(QWidget):
             }
         """
 
-        # Apply styling and properties to all candidate boxes
+# stylize voting boxes
         for box in [self.__box_isa, self.__box_gen, self.__box_han, self.__box_ira]:
             box.setCheckable(True)  # This is the magic that makes it toggle like a radio button
             box.setStyleSheet(box_style)
             box.setCursor(Qt.CursorShape.PointingHandCursor)
             vote_layout.addWidget(box)
 
-        # Map IDs to the buttons
+ # map buttons with id numbers
         self.__candidate_group.addButton(self.__box_isa, 1)
         self.__candidate_group.addButton(self.__box_gen, 2)
         self.__candidate_group.addButton(self.__box_han, 3)
@@ -125,36 +124,35 @@ class VoteApp(QWidget):
         self.setLayout(main_layout)
 
     def __show_voting_page(self) -> None:
-        """Transitions to the voting page and defaults the selection to Ira."""
+# default vote set to ira
         self.__box_ira.setChecked(True)
         self.__stacked_widget.setCurrentIndex(1)
 
     def __submit_vote(self) -> None:
-        """Handles vote submission, applies the Ira logic, and saves the result."""
+# take voting submission and gives to result
         selected_id = self.__candidate_group.checkedId()
 
-        # Map the ID back to the name
+ # map ids to the actual candidate names
         candidate_map = {1: "Isabella", 2: "Genji", 3: "Hannah", 4: "Ira"}
         candidate = candidate_map.get(selected_id)
 
-        # The core logic rule requested: if not Ira, ask if they are sure.
+# are u sure box for anti-ira votes
         if candidate != "Ira":
             reply = QMessageBox.question(self, "Hold on a second...",
                                          f"Are you SURE you want to vote for {candidate} instead of Ira?",
                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-            # If they say No, override their vote to Ira
             if reply == QMessageBox.StandardButton.No:
                 candidate = "Ira"
 
-        # Record vote via Data Manager
+# record vote
         self.__data_manager.cast_vote(candidate)
         QMessageBox.information(self, "Success", f"Vote recorded for {candidate}!")
 
-        # Return to main menu page after voting
+# main menu after the user is done voting for candidates
         self.__stacked_widget.setCurrentIndex(0)
 
     def __exit_app(self) -> None:
-        """Shows the final results message box and then closes the application."""
+# show the passed f string from previous
         results = self.__data_manager.get_results()
         QMessageBox.information(self, "Final Results", results)
         self.close()

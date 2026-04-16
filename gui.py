@@ -2,6 +2,7 @@ from tkinter import *
 
 
 class Gui:
+    # define the class and intitialization
     def __init__(self, window, cast_vote, get_results):
         self.window = window
         self.window.title('Vote Counter')
@@ -12,7 +13,7 @@ class Gui:
 
         self.votes = {'Isabella': 0, 'Genji': 0, 'Hannah': 0, 'total': 0}
 
-        # Title
+        # Create the title
         self.frame_title = Frame(self.window, bg='#1a0a14')
         self.label_title = Label(self.frame_title, text='🌸  VOTE COUNTER  🌸',
                                  bg='#1a0a14', fg='#f9d4e8',
@@ -32,7 +33,7 @@ class Gui:
         self.label_menu.pack()
         self.frame_menu_label.pack()
 
-        # Vote / Exit buttons in a grid, no radio indicator
+        # create the vote and exit buttons
         self.frame_option = Frame(self.window, bg='#1a0a14')
         self.radio_1 = IntVar()
         self.radio_1.set(0)
@@ -67,7 +68,7 @@ class Gui:
         self.radio_exit.grid(row=0, column=1, padx=10, pady=5, ipadx=5)
         self.frame_option.pack(pady=10)
 
-        # Candidate menu label (hidden until vote is selected)
+        # Candidate menu label
         self.frame_cand_label = Frame(self.window, bg='#1a0a14')
         self.label_cand_menu = Label(self.frame_cand_label, text='CANDIDATE MENU',
                                      bg='#1a0a14', fg='#c77aaa',
@@ -76,7 +77,7 @@ class Gui:
         self.frame_cand_label.pack()
         self.frame_cand_label.pack_forget()
 
-        # Candidate buttons in a grid, no radio indicator
+        # Candidate buttons when you decide to vote
         self.frame_candidate = Frame(self.window, bg='#1a0a14')
         self.radio_2 = IntVar()
         self.radio_2.set(0)
@@ -123,7 +124,7 @@ class Gui:
         self.frame_candidate.pack(pady=5)
         self.frame_candidate.pack_forget()
 
-        # Result label
+        # display results
         self.frame_result = Frame(self.window, bg='#1a0a14')
         self.label_result = Label(self.frame_result, text='',
                                   bg='#1a0a14', fg='#f9d4e8',
@@ -132,7 +133,7 @@ class Gui:
         self.label_result.pack(pady=5)
         self.frame_result.pack()
 
-        # Submit button
+        # submit button and associated function to pack and return
         self.frame_button = Frame(self.window, bg='#1a0a14')
         self.button_submit = Button(self.frame_button, text='SUBMIT',
                                     command=self.compute,
@@ -145,18 +146,21 @@ class Gui:
         self.button_submit.pack(pady=10)
         self.frame_button.pack()
 
+#function to show the condidates
     def show_candidates(self):
         self.label_result.config(text='')
         self.radio_2.set(0)
         self.frame_cand_label.pack()
         self.frame_candidate.pack(pady=5)
 
+#function call to show results on the window
     def show_results(self):
         self.frame_cand_label.pack_forget()
         self.frame_candidate.pack_forget()
         result = self.get_results(self.votes)
         self.label_result.config(text=result)
 
+#calculate results of total votes and display
     def compute(self):
         option = self.radio_1.get()
 

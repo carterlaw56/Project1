@@ -1,38 +1,40 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel,
-                             QPushButton, QMessageBox, QButtonGroup, QStackedWidget)
+                             QPushButton, QButtonGroup, QStackedWidget, QLineEdit)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
 
 class VoteApp(QWidget):
-# main class for the gui
+    # main class for the gui
 
-    def __init__(self, data_manager) -> None:
-# create window layout
+    def __init__(self, data_manager):
+        # create window layout
         super().__init__()
-        self.__data_manager = data_manager
-        self.__setup_ui()
+        self.data_manager = data_manager
+        self.current_voter_id = ""
+        self.current_candidate = ""
+        self.setup_ui()
 
-    def __setup_ui(self) -> None:
-# create system for setting screens and stuff
+    def setup_ui(self):
+        # create system for setting screens and stuff
         self.setWindowTitle("Vote Counter")
-        self.resize(320, 420)
+        self.resize(320, 500)
         self.setStyleSheet("background-color: #1a0a14; color: #f9d4e8;")
 
         main_layout = QVBoxLayout()
 
-# make the gui title
-        title_label = QLabel("VOTE COUNTER")
+        # make the gui title
+        title_label = QLabel("vote counter")
         title_label.setFont(QFont("Georgia", 14, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         main_layout.addWidget(title_label)
 
-# change from voting menu to main menu, etc
-        self.__stacked_widget = QStackedWidget()
-        main_layout.addWidget(self.__stacked_widget)
+        # extra
+        self.stacked_widget = QStackedWidget()
+        main_layout.addWidget(self.stacked_widget)
 
-# make da main menu
-        self.__menu_page = QWidget()
+        # main menu
+        self.menu_page = QWidget()
         menu_layout = QVBoxLayout()
 
         menu_label = QLabel("MAIN MENU")
@@ -40,23 +42,66 @@ class VoteApp(QWidget):
         menu_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         menu_layout.addWidget(menu_label)
 
-        self.__btn_goto_vote = QPushButton("VOTE")
-        self.__btn_goto_vote.setStyleSheet(
+        self.status_label = QLabel("")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.status_label.setStyleSheet("color: #a8f0c6; font-weight: bold;")
+        menu_layout.addWidget(self.status_label)
+
+        self.btn_goto_vote = QPushButton("VOTE")
+        self.btn_goto_vote.setStyleSheet(
             "background-color: #5a0830; padding: 15px; font-weight: bold; border-radius: 5px;")
-        self.__btn_goto_vote.clicked.connect(self.__show_voting_page)
-        menu_layout.addWidget(self.__btn_goto_vote)
+        self.btn_goto_vote.clicked.connect(self.show_id_page)
+        menu_layout.addWidget(self.btn_goto_vote)
 
-        self.__btn_exit = QPushButton("EXIT")
-        self.__btn_exit.setStyleSheet(
+        self.btn_exit = QPushButton("EXIT / RESULTS")
+        self.btn_exit.setStyleSheet(
             "background-color: #1e0a2e; padding: 15px; font-weight: bold; border-radius: 5px;")
-        self.__btn_exit.clicked.connect(self.__exit_app)
-        menu_layout.addWidget(self.__btn_exit)
+        self.btn_exit.clicked.connect(self.exit_app)
+        menu_layout.addWidget(self.btn_exit)
 
-        self.__menu_page.setLayout(menu_layout)
-        self.__stacked_widget.addWidget(self.__menu_page)
+        self.menu_page.setLayout(menu_layout)
+        self.stacked_widget.addWidget(self.menu_page)
 
-# create voting boxes and crap
-        self.__vote_page = QWidget()
+        # voter id check page
+        self.id_page = QWidget()
+        id_layout = QVBoxLayout()
+
+        id_label = QLabel("Voter Auth")
+        id_label.setFont(QFont("Georgia", 10, italic=True))
+        id_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        id_layout.addWidget(id_label)
+
+        self.id_input = QLineEdit()
+        self.id_input.setPlaceholderText("Enter 4-Digit Voter ID")
+        self.id_input.setMaxLength(4)
+        self.id_input.setStyleSheet(
+            "background-color: #2d1228; color: white; padding: 10px; border-radius: 5px; font-weight: bold; margin-top: 10px;")
+        self.id_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        id_layout.addWidget(self.id_input)
+
+        # Label to show ID errors
+        self.id_error_label = QLabel("")
+        self.id_error_label.setStyleSheet("color: #ff6666;")
+        self.id_error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        id_layout.addWidget(self.id_error_label)
+
+        self.btn_verify = QPushButton("CONTINUE")
+        self.btn_verify.setStyleSheet(
+            "background-color: #5a0830; padding: 10px; font-weight: bold; margin-top: 10px; border-radius: 5px;")
+        self.btn_verify.clicked.connect(self.verify_id)
+        id_layout.addWidget(self.btn_verify)
+
+        self.btn_cancel_id = QPushButton("CANCEL")
+        self.btn_cancel_id.setStyleSheet(
+            "background-color: #333333; padding: 10px; font-weight: bold; border-radius: 5px;")
+        self.btn_cancel_id.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
+        id_layout.addWidget(self.btn_cancel_id)
+
+        self.id_page.setLayout(id_layout)
+        self.stacked_widget.addWidget(self.id_page)
+
+        # voting page
+        self.vote_page = QWidget()
         vote_layout = QVBoxLayout()
 
         cand_label = QLabel("CANDIDATE MENU")
@@ -64,14 +109,14 @@ class VoteApp(QWidget):
         cand_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         vote_layout.addWidget(cand_label)
 
-        self.__candidate_group = QButtonGroup(self)
-# make boxes and give them names
-        self.__box_isa = QPushButton("Isabella")
-        self.__box_gen = QPushButton("Genji")
-        self.__box_han = QPushButton("Hannah")
-        self.__box_ira = QPushButton("Ira")
+        self.candidate_group = QButtonGroup(self)
+        # make boxes and give them names
+        self.box_isa = QPushButton("William Taft")
+        self.box_gen = QPushButton("Margaret Thatcher")
+        self.box_han = QPushButton("David")
+        self.box_ira = QPushButton("Ira")
 
-# allow user to see higlighted button to make sure they pressed the right candidate
+        # stylize voting boxes
         box_style = """
             QPushButton {
                 background-color: #2d1228;
@@ -93,66 +138,135 @@ class VoteApp(QWidget):
             }
         """
 
-# stylize voting boxes
-        for box in [self.__box_isa, self.__box_gen, self.__box_han, self.__box_ira]:
-            box.setCheckable(True)  # This is the magic that makes it toggle like a radio button
+        for box in [self.box_isa, self.box_gen, self.box_han, self.box_ira]:
+            box.setCheckable(True)
             box.setStyleSheet(box_style)
             box.setCursor(Qt.CursorShape.PointingHandCursor)
             vote_layout.addWidget(box)
 
- # map buttons with id numbers
-        self.__candidate_group.addButton(self.__box_isa, 1)
-        self.__candidate_group.addButton(self.__box_gen, 2)
-        self.__candidate_group.addButton(self.__box_han, 3)
-        self.__candidate_group.addButton(self.__box_ira, 4)
+        # map buttons with id numbers
+        self.candidate_group.addButton(self.box_isa, 1)
+        self.candidate_group.addButton(self.box_gen, 2)
+        self.candidate_group.addButton(self.box_han, 3)
+        self.candidate_group.addButton(self.box_ira, 4)
 
-        self.__btn_submit = QPushButton("SUBMIT VOTE")
-        self.__btn_submit.setStyleSheet(
+        # submit button
+        self.btn_submit = QPushButton("submit...")
+        self.btn_submit.setStyleSheet(
             "background-color: #5a0830; padding: 10px; font-weight: bold; margin-top: 10px; border-radius: 5px;")
-        self.__btn_submit.clicked.connect(self.__submit_vote)
-        vote_layout.addWidget(self.__btn_submit)
+        self.btn_submit.clicked.connect(self.submit_vote)
+        vote_layout.addWidget(self.btn_submit)
 
-        self.__btn_cancel = QPushButton("CANCEL")
-        self.__btn_cancel.setStyleSheet(
+        # cancel button
+        self.btn_cancel_vote = QPushButton("CANCEL")
+        self.btn_cancel_vote.setStyleSheet(
             "background-color: #333333; padding: 10px; font-weight: bold; border-radius: 5px;")
-        self.__btn_cancel.clicked.connect(lambda: self.__stacked_widget.setCurrentIndex(0))
-        vote_layout.addWidget(self.__btn_cancel)
+        self.btn_cancel_vote.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
+        vote_layout.addWidget(self.btn_cancel_vote)
 
-        self.__vote_page.setLayout(vote_layout)
-        self.__stacked_widget.addWidget(self.__vote_page)
+        self.vote_page.setLayout(vote_layout)
+        self.stacked_widget.addWidget(self.vote_page)
 
+        # make ppl doubt themselves for voting for anyone that isn't ira
+        self.confirm_page = QWidget()
+        confirm_layout = QVBoxLayout()
+
+        self.confirm_label = QLabel("")
+        self.confirm_label.setWordWrap(True)
+        self.confirm_label.setFont(QFont("Georgia", 11, italic=True))
+        self.confirm_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        confirm_layout.addWidget(self.confirm_label)
+
+        self.btn_yes = QPushButton("yes")
+        self.btn_yes.setStyleSheet(
+            "background-color: #5a0830; padding: 15px; font-weight: bold; border-radius: 5px; margin-top: 20px;")
+        self.btn_yes.clicked.connect(self.confirm_yes)
+        confirm_layout.addWidget(self.btn_yes)
+
+        self.btn_no = QPushButton("NO, VOTE IRA INSTEAD")
+        self.btn_no.setStyleSheet("background-color: #1e0a2e; padding: 15px; font-weight: bold; border-radius: 5px;")
+        self.btn_no.clicked.connect(self.confirm_no)
+        confirm_layout.addWidget(self.btn_no)
+        self.confirm_page.setLayout(confirm_layout)
+        self.stacked_widget.addWidget(self.confirm_page)
+
+        # result page
+        self.results_page = QWidget()
+        results_layout = QVBoxLayout()
+
+        results_title = QLabel("final result")
+        results_title.setFont(QFont("Georgia", 12, QFont.Weight.Bold))
+        results_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        results_layout.addWidget(results_title)
+
+        self.results_label = QLabel("")
+        self.results_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.results_label.setFont(QFont("Georgia", 12))
+        results_layout.addWidget(self.results_label)
+
+        self.btn_close = QPushButton("CLOSE APP")
+        self.btn_close.setStyleSheet(
+            "background-color: #5a0830; padding: 15px; font-weight: bold; border-radius: 5px; margin-top: 20px;")
+        self.btn_close.clicked.connect(self.close)
+        results_layout.addWidget(self.btn_close)
+
+        self.results_page.setLayout(results_layout)
+        self.stacked_widget.addWidget(self.results_page)
         self.setLayout(main_layout)
 
-    def __show_voting_page(self) -> None:
-# default vote set to ira
-        self.__box_ira.setChecked(True)
-        self.__stacked_widget.setCurrentIndex(1)
+    def show_id_page(self):
+        # id default
+        self.id_input.clear()
+        self.id_error_label.setText("")
+        self.status_label.setText("")
+        self.stacked_widget.setCurrentIndex(1)
 
-    def __submit_vote(self) -> None:
-# take voting submission and gives to result
-        selected_id = self.__candidate_group.checkedId()
+    def verify_id(self):
+        # Check Voter ID before advancing to voting menu
+        voter_id = self.id_input.text().strip()
+        if not voter_id.isdigit() or len(voter_id) != 4:
+            self.id_error_label.setText("id must be 4 numbers.")
+            return
 
- # map ids to the actual candidate names
-        candidate_map = {1: "Isabella", 2: "Genji", 3: "Hannah", 4: "Ira"}
+        if self.data_manager.has_voted(voter_id):
+            self.id_error_label.setText("Error: vote id alr voted.")
+            return
+
+        self.current_voter_id = voter_id
+        self.box_ira.setChecked(True)  # default vote ira
+        self.stacked_widget.setCurrentIndex(2)
+
+    def submit_vote(self):
+        selected_id = self.candidate_group.checkedId()
+        # map ids to the actual candidate names
+        candidate_map = {1: "William Taft", 2: "Margaret Thatcher", 3: "David", 4: "Ira"}
         candidate = candidate_map.get(selected_id)
 
-# are u sure box for anti-ira votes
+        # temporary save if needed
+        self.current_candidate = candidate
+
+        # are u sure screen for anti-ira votes
         if candidate != "Ira":
-            reply = QMessageBox.question(self, "Hold on a second...",
-                                         f"Are you SURE you want to vote for {candidate} instead of Ira?",
-                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-            if reply == QMessageBox.StandardButton.No:
-                candidate = "Ira"
+            self.confirm_label.setText(
+                f"\n\n you SURE you want to vote for {candidate}?")
+            self.stacked_widget.setCurrentIndex(3)
+        else:
+            self.finalize_vote(candidate)
 
-# record vote
-        self.__data_manager.cast_vote(candidate)
-        QMessageBox.information(self, "Success", f"Vote recorded for {candidate}!")
+    def confirm_yes(self):
+        self.finalize_vote(self.current_candidate)
 
-# main menu after the user is done voting for candidates
-        self.__stacked_widget.setCurrentIndex(0)
+    def confirm_no(self):
+        self.finalize_vote("Ira")
 
-    def __exit_app(self) -> None:
-# show the passed f string from previous
-        results = self.__data_manager.get_results()
-        QMessageBox.information(self, "Final Results", results)
-        self.close()
+    def finalize_vote(self, candidate):
+        # save vote
+        self.data_manager.cast_vote(candidate, self.current_voter_id)
+        self.status_label.setText(f"Success: Vote saved for {candidate}!")
+        self.stacked_widget.setCurrentIndex(0)
+
+    def exit_app(self):
+        # result screen
+        results = self.data_manager.get_results()
+        self.results_label.setText(results)
+        self.stacked_widget.setCurrentIndex(4)

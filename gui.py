@@ -38,6 +38,7 @@ class VoteApp(QWidget):
         main_layout.addWidget(self.stacked_widget)
 
         # Main menu
+        # some help from claude to make this menu of the gui look pretty
         self.menu_page = QWidget()
         menu_layout = QVBoxLayout()
 
@@ -165,7 +166,7 @@ class VoteApp(QWidget):
         self.vote_page.setLayout(vote_layout)
         self.stacked_widget.addWidget(self.vote_page)
 
-        # deter anti-ira voters
+        # deter anti-ira voters by asking them if they are sure
         self.confirm_page = QWidget()
         confirm_layout = QVBoxLayout()
 

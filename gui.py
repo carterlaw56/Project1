@@ -62,7 +62,7 @@ class VoteApp(QWidget):
         self.menu_page.setLayout(menu_layout)
         self.stacked_widget.addWidget(self.menu_page)
 
-        # voter id check page
+        # setup voter id check page
         self.id_page = QWidget()
         id_layout = QVBoxLayout()
 
@@ -71,6 +71,7 @@ class VoteApp(QWidget):
         id_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         id_layout.addWidget(id_label)
 
+# section to ask the user for the id to ensure no double votes
         self.id_input = QLineEdit()
         self.id_input.setPlaceholderText("Enter 4-Digit Voter ID")
         self.id_input.setMaxLength(4)
@@ -91,6 +92,7 @@ class VoteApp(QWidget):
         self.btn_verify.clicked.connect(self.verify_id)
         id_layout.addWidget(self.btn_verify)
 
+# create the cancel button to stop from submitting the vote
         self.btn_cancel_id = QPushButton("CANCEL")
         self.btn_cancel_id.setStyleSheet(
             "background-color: #333333; padding: 10px; font-weight: bold; border-radius: 5px;")
@@ -116,7 +118,7 @@ class VoteApp(QWidget):
         self.box_han = QPushButton("David")
         self.box_ira = QPushButton("Ira")
 
-        # stylize voting boxes
+        # essentially stylize voting boxes
         box_style = """
             QPushButton {
                 background-color: #2d1228;
@@ -168,6 +170,7 @@ class VoteApp(QWidget):
         self.stacked_widget.addWidget(self.vote_page)
 
         # make ppl doubt themselves for voting for anyone that isn't ira
+        # some help from claude to create this voting page that only occurs of a non-ira vote is attempted
         self.confirm_page = QWidget()
         confirm_layout = QVBoxLayout()
 
@@ -183,14 +186,14 @@ class VoteApp(QWidget):
         self.btn_yes.clicked.connect(self.confirm_yes)
         confirm_layout.addWidget(self.btn_yes)
 
-        self.btn_no = QPushButton("NO, VOTE IRA INSTEAD")
+        self.btn_no = QPushButton("no, VOTE IRA INSTEAD")
         self.btn_no.setStyleSheet("background-color: #1e0a2e; padding: 15px; font-weight: bold; border-radius: 5px;")
         self.btn_no.clicked.connect(self.confirm_no)
         confirm_layout.addWidget(self.btn_no)
         self.confirm_page.setLayout(confirm_layout)
         self.stacked_widget.addWidget(self.confirm_page)
 
-        # result page
+        # setup the display for the result page
         self.results_page = QWidget()
         results_layout = QVBoxLayout()
 
@@ -204,7 +207,7 @@ class VoteApp(QWidget):
         self.results_label.setFont(QFont("Georgia", 12))
         results_layout.addWidget(self.results_label)
 
-        self.btn_close = QPushButton("CLOSE APP")
+        self.btn_close = QPushButton("close application")
         self.btn_close.setStyleSheet(
             "background-color: #5a0830; padding: 15px; font-weight: bold; border-radius: 5px; margin-top: 20px;")
         self.btn_close.clicked.connect(self.close)
@@ -222,7 +225,7 @@ class VoteApp(QWidget):
         self.stacked_widget.setCurrentIndex(1)
 
     def verify_id(self):
-        # Check Voter ID before advancing to voting menu
+        # Check voter before advancing to voting menu
         voter_id = self.id_input.text().strip()
         if not voter_id.isdigit() or len(voter_id) != 4:
             self.id_error_label.setText("id must be 4 numbers.")
@@ -245,7 +248,7 @@ class VoteApp(QWidget):
         # temporary save if needed
         self.current_candidate = candidate
 
-        # are u sure screen for anti-ira votes
+        # are u sure screen for anti-ira votes. if they are sure, it will record the vote for their intended candidate
         if candidate != "Ira":
             self.confirm_label.setText(
                 f"\n\n you SURE you want to vote for {candidate}?")
@@ -260,13 +263,13 @@ class VoteApp(QWidget):
         self.finalize_vote("Ira")
 
     def finalize_vote(self, candidate):
-        # save vote
+        # save vote to the databse in the same folder where the python script is running on the computer
         self.data_manager.cast_vote(candidate, self.current_voter_id)
         self.status_label.setText(f"Success: Vote saved for {candidate}!")
         self.stacked_widget.setCurrentIndex(0)
 
     def exit_app(self):
-        # result screen
+        # creat a function for the result screen
         results = self.data_manager.get_results()
         self.results_label.setText(results)
         self.stacked_widget.setCurrentIndex(4)
